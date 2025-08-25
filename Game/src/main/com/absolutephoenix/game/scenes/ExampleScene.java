@@ -6,18 +6,16 @@ import com.absolutephoenix.engine.rendering.SpriteBatch;
 import com.absolutephoenix.engine.rendering.Texture;
 import com.absolutephoenix.game.Scene;
 import org.lwjgl.glfw.GLFW;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.absolutephoenix.engine.logging.LogLevel;
+import com.absolutephoenix.engine.logging.Logger;
 
 /**
  * Example scene demonstrating input handling and rendering.
  */
 public class ExampleScene implements Scene {
-    private static final Logger LOGGER = Logger.getLogger(ExampleScene.class.getName());
-
     static {
         boolean enableLogs = Boolean.parseBoolean(System.getProperty("exampleScene.logging", "true"));
-        LOGGER.setLevel(enableLogs ? Level.INFO : Level.OFF);
+        Logger.setLevel(enableLogs ? LogLevel.INFO : LogLevel.OFF);
     }
 
     private final Texture texture;
@@ -44,55 +42,55 @@ public class ExampleScene implements Scene {
         }
         InputHandler input = maybeInput.get();
         if (input.keyboard.keyPressed(GLFW.GLFW_KEY_SPACE)) {
-            LOGGER.info("Space pressed");
+            Logger.info("Space pressed");
         }
         if (input.mouse.buttonPressed(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
-            LOGGER.info("Mouse clicked at " + input.mouse.getX() + ", " + input.mouse.getY());
+            Logger.info("Mouse clicked at " + input.mouse.getX() + ", " + input.mouse.getY());
         }
         if (input.mouse.getScrollY() != 0) {
-            LOGGER.info("Scrolled: " + input.mouse.getScrollY());
+            Logger.info("Scrolled: " + input.mouse.getScrollY());
         }
         if (input.controller.squarePressed()) {
-            LOGGER.info("Square button pressed");
+            Logger.info("Square button pressed");
         }
         if (input.controller.crossPressed()) {
-            LOGGER.info("Cross button pressed");
+            Logger.info("Cross button pressed");
         }
         if (input.controller.circlePressed()) {
-            LOGGER.info("Circle button pressed");
+            Logger.info("Circle button pressed");
         }
         if (input.controller.trianglePressed()) {
-            LOGGER.info("Triangle button pressed");
+            Logger.info("Triangle button pressed");
         }
         if (input.controller.startPressed()) {
-            LOGGER.info("Start button pressed");
+            Logger.info("Start button pressed");
         }
         if (input.controller.selectPressed()) {
-            LOGGER.info("Select button pressed");
+            Logger.info("Select button pressed");
         }
         if (input.controller.dpadUpPressed()) {
-            LOGGER.info("DPad Up pressed");
+            Logger.info("DPad Up pressed");
         }
         if (input.controller.dpadDownPressed()) {
-            LOGGER.info("DPad Down pressed");
+            Logger.info("DPad Down pressed");
         }
         if (input.controller.dpadLeftPressed()) {
-            LOGGER.info("DPad Left pressed");
+            Logger.info("DPad Left pressed");
         }
         if (input.controller.dpadRightPressed()) {
-            LOGGER.info("DPad Right pressed");
+            Logger.info("DPad Right pressed");
         }
         if (input.controller.leftBumperPressed()) {
-            LOGGER.info("Left bumper pressed");
+            Logger.info("Left bumper pressed");
         }
         if (input.controller.rightBumperPressed()) {
-            LOGGER.info("Right bumper pressed");
+            Logger.info("Right bumper pressed");
         }
         if (input.controller.leftStickPressed()) {
-            LOGGER.info("Left stick pressed");
+            Logger.info("Left stick pressed");
         }
         if (input.controller.rightStickPressed()) {
-            LOGGER.info("Right stick pressed");
+            Logger.info("Right stick pressed");
         }
 
         float TRIGGER_DEADZONE = 0.05f; // tweak as needed
@@ -101,11 +99,11 @@ public class ExampleScene implements Scene {
         float rt = input.controller.rightTrigger();
 
         if (lt > TRIGGER_DEADZONE) {
-            LOGGER.info("Left trigger: " + lt);
+            Logger.info("Left trigger: " + lt);
         }
 
         if (rt > TRIGGER_DEADZONE) {
-            LOGGER.info("Right trigger: " + rt);
+            Logger.info("Right trigger: " + rt);
         }
 
         float lx = input.controller.leftStickX();
@@ -118,18 +116,18 @@ public class ExampleScene implements Scene {
         // Left stick
         float leftMag = (float)Math.sqrt(lx * lx + ly * ly);
         if (leftMag > DEADZONE) {
-            LOGGER.info("Left stick: " + lx + ", " + ly);
+            Logger.info("Left stick: " + lx + ", " + ly);
         }
 
         // Right stick
         float rightMag = (float)Math.sqrt(rx * rx + ry * ry);
         if (rightMag > DEADZONE) {
-            LOGGER.info("Right stick: " + rx + ", " + ry);
+            Logger.info("Right stick: " + rx + ", " + ry);
         }
 
-        if (input.controller.psTrackpadPressed()) LOGGER.info("TrackPad PRESSED");
-        if (input.controller.psMutePressed())     LOGGER.info("Mute PRESSED");
-        if (input.controller.guidePressed())      LOGGER.info("Guide PRESSED");
+        if (input.controller.psTrackpadPressed()) Logger.info("TrackPad PRESSED");
+        if (input.controller.psMutePressed())     Logger.info("Mute PRESSED");
+        if (input.controller.guidePressed())      Logger.info("Guide PRESSED");
 
     }
 
