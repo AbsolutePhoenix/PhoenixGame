@@ -1,0 +1,11 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':Engine')
+}
+
+application {
+    mainClass = 'com.absolutephoenix.game.Game'
+}

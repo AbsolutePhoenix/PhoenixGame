@@ -1,0 +1,25 @@
+allprojects {
+    group = 'com.absolutephoenix'
+    version = '0.1.0'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main']
+            }
+        }
+        test {
+            java {
+                srcDirs = ['src/test']
+            }
+        }
+    }
+}
