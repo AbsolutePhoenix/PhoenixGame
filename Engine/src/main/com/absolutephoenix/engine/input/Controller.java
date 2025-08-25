@@ -96,17 +96,17 @@ public class Controller {
     }
 
     // Convenience PlayStation-style names for face buttons
-    public boolean squareDown() { return buttonDown(BUTTON_X); }
-    public boolean squarePressed() { return buttonPressed(BUTTON_X); }
-    public boolean squareReleased() { return buttonReleased(BUTTON_X); }
+    public boolean squareDown() { return buttonDown(BUTTON_A); }
+    public boolean squarePressed() { return buttonPressed(BUTTON_A); }
+    public boolean squareReleased() { return buttonReleased(BUTTON_A); }
 
-    public boolean crossDown() { return buttonDown(BUTTON_A); }
-    public boolean crossPressed() { return buttonPressed(BUTTON_A); }
-    public boolean crossReleased() { return buttonReleased(BUTTON_A); }
+    public boolean crossDown() { return buttonDown(BUTTON_B); }
+    public boolean crossPressed() { return buttonPressed(BUTTON_B); }
+    public boolean crossReleased() { return buttonReleased(BUTTON_B); }
 
-    public boolean circleDown() { return buttonDown(BUTTON_B); }
-    public boolean circlePressed() { return buttonPressed(BUTTON_B); }
-    public boolean circleReleased() { return buttonReleased(BUTTON_B); }
+    public boolean circleDown() { return buttonDown(BUTTON_X); }
+    public boolean circlePressed() { return buttonPressed(BUTTON_X); }
+    public boolean circleReleased() { return buttonReleased(BUTTON_X); }
 
     public boolean triangleDown() { return buttonDown(BUTTON_Y); }
     public boolean trianglePressed() { return buttonPressed(BUTTON_Y); }

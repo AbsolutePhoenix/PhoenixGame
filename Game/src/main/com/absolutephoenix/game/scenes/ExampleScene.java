@@ -44,6 +44,12 @@ public class ExampleScene implements Scene {
         if (input.controller.crossPressed()) {
             System.out.println("Cross button pressed");
         }
+        if (input.controller.circlePressed()) {
+            System.out.println("Circle button pressed");
+        }
+        if (input.controller.trianglePressed()) {
+            System.out.println("Triangle button pressed");
+        }
         if (input.controller.startPressed()) {
             System.out.println("Start button pressed");
         }
@@ -56,12 +62,22 @@ public class ExampleScene implements Scene {
         if (input.controller.leftBumperPressed()) {
             System.out.println("Left bumper pressed");
         }
+        if (input.controller.rightBumperPressed()) {
+            System.out.println("Right bumper pressed");
+        }
         if (input.controller.leftTriggerPressed()) {
             System.out.println("Left trigger value: " + input.controller.leftTrigger());
         }
+        if (input.controller.rightTriggerPressed()) {
+            System.out.println("Right trigger value: " + input.controller.leftTrigger());
+        }
+
         if (Math.abs(input.controller.leftStickX()) > 0.1f || Math.abs(input.controller.leftStickY()) > 0.1f) {
             System.out.println("Left stick: " + input.controller.leftStickX() + ", " + input.controller.leftStickY());
         }
+//        if (Math.abs(input.controller.rightStickX()) > 0.1f || Math.abs(input.controller.rightStickY()) > 0.1f) {
+//            System.out.println("Right stick: " + input.controller.rightStickX() + ", " + input.controller.rightStickY());
+//        }
     }
 
     @Override
