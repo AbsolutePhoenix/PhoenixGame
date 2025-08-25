@@ -18,3 +18,10 @@ Use the Gradle wrapper to build the project:
 > **Note:** The `gradle-wrapper.jar` binary is not included in this repository. Add it manually or run `gradle wrapper` to generate it before using `./gradlew`. Alternatively, you can invoke the system Gradle installation with `gradle build`.
 
 This will compile all modules and run any tests.
+
+## Scene Lifecycle
+
+Scenes added to the {@code SceneManager} remain loaded after they are
+deactivated. They can be reactivated later, or removed explicitly with
+`removeScene(String)`. Passing {@code true} to `setScene(String, boolean)`
+will clean up and discard the previous scene after activation of the new one.
