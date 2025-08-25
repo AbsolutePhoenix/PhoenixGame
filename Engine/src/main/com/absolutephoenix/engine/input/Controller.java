@@ -1,106 +1,86 @@
 package com.absolutephoenix.engine.input;
 
-import com.studiohartman.jamepad.ControllerAxis;
-import com.studiohartman.jamepad.ControllerButton;
-import com.studiohartman.jamepad.ControllerManager;
-import com.studiohartman.jamepad.ControllerState;
+import org.lwjgl.glfw.GLFW;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 /**
- * Polls controller/gamepad state using Jamepad.
+ * Polls controller/gamepad state using GLFW.
  */
 public class Controller {
+    private static final int MAX_BUTTONS = 32;
+    private static final int MAX_AXES = 6;
     private static final float TRIGGER_THRESHOLD = 0.5f;
 
-    private final ControllerManager manager = new ControllerManager();
-    private ControllerState current;
-    private ControllerState previous;
+    private final boolean[] current = new boolean[MAX_BUTTONS];
+    private final boolean[] previous = new boolean[MAX_BUTTONS];
+    private final float[] axesCurrent = new float[MAX_AXES];
+    private final float[] axesPrevious = new float[MAX_AXES];
 
     // Common button constants
-    public static final int BUTTON_A = ControllerButton.A.ordinal(); // Cross on PlayStation
-    public static final int BUTTON_B = ControllerButton.B.ordinal(); // Circle on PlayStation
-    public static final int BUTTON_X = ControllerButton.X.ordinal(); // Square on PlayStation
-    public static final int BUTTON_Y = ControllerButton.Y.ordinal(); // Triangle on PlayStation
-    public static final int BUTTON_START = ControllerButton.START.ordinal();
-    public static final int BUTTON_SELECT = ControllerButton.BACK.ordinal();
-    public static final int BUTTON_LB = ControllerButton.LEFTBUMPER.ordinal();
-    public static final int BUTTON_RB = ControllerButton.RIGHTBUMPER.ordinal();
-    public static final int BUTTON_LS = ControllerButton.LEFTSTICK.ordinal();
-    public static final int BUTTON_RS = ControllerButton.RIGHTSTICK.ordinal();
-    public static final int BUTTON_DPAD_UP = ControllerButton.DPAD_UP.ordinal();
-    public static final int BUTTON_DPAD_RIGHT = ControllerButton.DPAD_RIGHT.ordinal();
-    public static final int BUTTON_DPAD_DOWN = ControllerButton.DPAD_DOWN.ordinal();
-    public static final int BUTTON_DPAD_LEFT = ControllerButton.DPAD_LEFT.ordinal();
+    public static final int BUTTON_A = GLFW.GLFW_GAMEPAD_BUTTON_A; // Cross on PlayStation
+    public static final int BUTTON_B = GLFW.GLFW_GAMEPAD_BUTTON_B; // Circle on PlayStation
+    public static final int BUTTON_X = GLFW.GLFW_GAMEPAD_BUTTON_X; // Square on PlayStation
+    public static final int BUTTON_Y = GLFW.GLFW_GAMEPAD_BUTTON_Y; // Triangle on PlayStation
+    public static final int BUTTON_START = GLFW.GLFW_GAMEPAD_BUTTON_START;
+    public static final int BUTTON_SELECT = GLFW.GLFW_GAMEPAD_BUTTON_BACK;
+    public static final int BUTTON_LB = GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
+    public static final int BUTTON_RB = GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
+    public static final int BUTTON_LS = GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB;
+    public static final int BUTTON_RS = GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB;
+    public static final int BUTTON_DPAD_UP = GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP;
+    public static final int BUTTON_DPAD_RIGHT = GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT;
+    public static final int BUTTON_DPAD_DOWN = GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
+    public static final int BUTTON_DPAD_LEFT = GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
 
     // Axis constants
-    public static final int AXIS_LEFT_X = ControllerAxis.LEFTX.ordinal();
-    public static final int AXIS_LEFT_Y = ControllerAxis.LEFTY.ordinal();
-    public static final int AXIS_RIGHT_X = ControllerAxis.RIGHTX.ordinal();
-    public static final int AXIS_RIGHT_Y = ControllerAxis.RIGHTY.ordinal();
-    public static final int AXIS_LT = ControllerAxis.TRIGGERLEFT.ordinal();
-    public static final int AXIS_RT = ControllerAxis.TRIGGERRIGHT.ordinal();
-
-    public Controller() {
-        manager.initSDLGamepad();
-        current = manager.getState(0);
-        previous = current;
-    }
+    public static final int AXIS_LEFT_X = GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
+    public static final int AXIS_LEFT_Y = GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
+    public static final int AXIS_RIGHT_X = GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
+    public static final int AXIS_RIGHT_Y = GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
+    public static final int AXIS_LT = GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
+    public static final int AXIS_RT = GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
 
     void poll() {
-        current = manager.getState(0);
+        if (GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1)) {
+            ByteBuffer buttons = GLFW.glfwGetJoystickButtons(GLFW.GLFW_JOYSTICK_1);
+            if (buttons != null) {
+                int limit = Math.min(buttons.limit(), MAX_BUTTONS);
+                for (int i = 0; i < limit; i++) {
+                    current[i] = buttons.get(i) == GLFW.GLFW_PRESS;
+                }
+            }
+
+            FloatBuffer axes = GLFW.glfwGetJoystickAxes(GLFW.GLFW_JOYSTICK_1);
+            if (axes != null) {
+                int limit = Math.min(axes.limit(), MAX_AXES);
+                for (int i = 0; i < limit; i++) {
+                    axesCurrent[i] = axes.get(i);
+                }
+            }
+        }
     }
 
     void update() {
-        previous = current;
-    }
+        System.arraycopy(current, 0, previous, 0, current.length);
+        System.arraycopy(axesCurrent, 0, axesPrevious, 0, axesCurrent.length);
 
-    private boolean getButton(ControllerState state, int button) {
-        if (button == BUTTON_A) return state.a;
-        if (button == BUTTON_B) return state.b;
-        if (button == BUTTON_X) return state.x;
-        if (button == BUTTON_Y) return state.y;
-        if (button == BUTTON_START) return state.start;
-        if (button == BUTTON_SELECT) return state.back;
-        if (button == BUTTON_LB) return state.lb;
-        if (button == BUTTON_RB) return state.rb;
-        if (button == BUTTON_LS) return state.leftStickClick;
-        if (button == BUTTON_RS) return state.rightStickClick;
-        if (button == BUTTON_DPAD_UP) return state.dpadUp;
-        if (button == BUTTON_DPAD_RIGHT) return state.dpadRight;
-        if (button == BUTTON_DPAD_DOWN) return state.dpadDown;
-        if (button == BUTTON_DPAD_LEFT) return state.dpadLeft;
-        return false;
     }
 
     public boolean buttonDown(int button) {
-        return getButton(current, button);
+        return button < current.length && current[button];
     }
 
     public boolean buttonPressed(int button) {
-        return getButton(current, button) && !getButton(previous, button);
+        return button < current.length && current[button] && !previous[button];
     }
 
     public boolean buttonReleased(int button) {
-        return !getButton(current, button) && getButton(previous, button);
+        return button < current.length && !current[button] && previous[button];
     }
-
+  
     public float axis(int axis) {
-        if (axis == AXIS_LEFT_X) return current.leftStickX;
-        if (axis == AXIS_LEFT_Y) return current.leftStickY;
-        if (axis == AXIS_RIGHT_X) return current.rightStickX;
-        if (axis == AXIS_RIGHT_Y) return current.rightStickY;
-        if (axis == AXIS_LT) return current.leftTrigger;
-        if (axis == AXIS_RT) return current.rightTrigger;
-        return 0f;
-    }
-
-    private float previousAxis(int axis) {
-        if (axis == AXIS_LEFT_X) return previous.leftStickX;
-        if (axis == AXIS_LEFT_Y) return previous.leftStickY;
-        if (axis == AXIS_RIGHT_X) return previous.rightStickX;
-        if (axis == AXIS_RIGHT_Y) return previous.rightStickY;
-        if (axis == AXIS_LT) return previous.leftTrigger;
-        if (axis == AXIS_RT) return previous.rightTrigger;
-        return 0f;
+        return axis < axesCurrent.length ? axesCurrent[axis] : 0f;
     }
 
     private boolean triggerDown(int axis) {
@@ -108,25 +88,25 @@ public class Controller {
     }
 
     private boolean triggerPressed(int axis) {
-        return triggerDown(axis) && previousAxis(axis) <= TRIGGER_THRESHOLD;
+        return triggerDown(axis) && axesPrevious[axis] <= TRIGGER_THRESHOLD;
     }
 
     private boolean triggerReleased(int axis) {
-        return !triggerDown(axis) && previousAxis(axis) > TRIGGER_THRESHOLD;
+        return !triggerDown(axis) && axesPrevious[axis] > TRIGGER_THRESHOLD;
     }
 
     // Convenience PlayStation-style names for face buttons
-    public boolean squareDown() { return buttonDown(BUTTON_X); }
-    public boolean squarePressed() { return buttonPressed(BUTTON_X); }
-    public boolean squareReleased() { return buttonReleased(BUTTON_X); }
+    public boolean squareDown() { return buttonDown(BUTTON_A); }
+    public boolean squarePressed() { return buttonPressed(BUTTON_A); }
+    public boolean squareReleased() { return buttonReleased(BUTTON_A); }
 
-    public boolean crossDown() { return buttonDown(BUTTON_A); }
-    public boolean crossPressed() { return buttonPressed(BUTTON_A); }
-    public boolean crossReleased() { return buttonReleased(BUTTON_A); }
+    public boolean crossDown() { return buttonDown(BUTTON_B); }
+    public boolean crossPressed() { return buttonPressed(BUTTON_B); }
+    public boolean crossReleased() { return buttonReleased(BUTTON_B); }
 
-    public boolean circleDown() { return buttonDown(BUTTON_B); }
-    public boolean circlePressed() { return buttonPressed(BUTTON_B); }
-    public boolean circleReleased() { return buttonReleased(BUTTON_B); }
+    public boolean circleDown() { return buttonDown(BUTTON_X); }
+    public boolean circlePressed() { return buttonPressed(BUTTON_X); }
+    public boolean circleReleased() { return buttonReleased(BUTTON_X); }
 
     public boolean triangleDown() { return buttonDown(BUTTON_Y); }
     public boolean trianglePressed() { return buttonPressed(BUTTON_Y); }
@@ -193,4 +173,3 @@ public class Controller {
     public float rightStickX() { return axis(AXIS_RIGHT_X); }
     public float rightStickY() { return axis(AXIS_RIGHT_Y); }
 }
-
