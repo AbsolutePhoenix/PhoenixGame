@@ -23,6 +23,9 @@ public class Controller {
     private final float[]   axesCurrent = new float[MAX_AXES];
     private final float[]   axesPrevious = new float[MAX_AXES];
 
+    // Reusable state buffer to avoid per-frame allocations
+    private final GLFWGamepadState state = GLFWGamepadState.create();
+
     // Raw state (for extra buttons like PS5 trackpad/mute)
     private final boolean[] rawCurrent = new boolean[MAX_BUTTONS];
     private final boolean[] rawPrevious = new boolean[MAX_BUTTONS];
@@ -81,7 +84,7 @@ public class Controller {
     }
 
     // Call this after update() each frame
-    public void poll() {
+    public synchronized void poll() {
 
         if (!GLFW.glfwJoystickPresent(JID)) {
             // Clear states if absent
@@ -110,14 +113,13 @@ public class Controller {
 
         // Prefer standardized mapping if available
         if (standardized) {
-            GLFWGamepadState s = GLFWGamepadState.create();
-            if (GLFW.glfwGetGamepadState(JID, s)) {
-                ByteBuffer stdButtons = s.buttons();
+            if (GLFW.glfwGetGamepadState(JID, state)) {
+                ByteBuffer stdButtons = state.buttons();
                 int blim = Math.min(stdButtons.limit(), MAX_BUTTONS);
                 for (int i = 0; i < blim; i++) current[i] = stdButtons.get(i) == GLFW.GLFW_PRESS;
                 for (int i = blim; i < MAX_BUTTONS; i++) current[i] = false;
 
-                FloatBuffer stdAxes = s.axes();
+                FloatBuffer stdAxes = state.axes();
                 int alim = Math.min(stdAxes.limit(), MAX_AXES);
                 for (int i = 0; i < alim; i++) axesCurrent[i] = stdAxes.get(i); // overwrite with standardized
                 for (int i = alim; i < MAX_AXES; i++) axesCurrent[i] = 0f;
