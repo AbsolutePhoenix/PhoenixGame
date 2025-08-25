@@ -1,8 +1,15 @@
-package com.absolutephoenix.engine;
+package com.absolutephoenix.engine.core;
 
+import com.absolutephoenix.engine.input.InputHandler;
+import com.absolutephoenix.engine.window.Window;
+
+/**
+ * Main engine that owns the window and drives the game loop.
+ */
 public class Engine {
     private final Window window;
     private final GameLoop gameLoop;
+    private InputHandler input;
     private int targetUPS = 60;
     private int targetFPS = 60;
     private boolean vsync;
@@ -15,14 +22,22 @@ public class Engine {
         this.baseTitle = title;
     }
 
+    /** Returns the input handler associated with this engine. */
+    public InputHandler getInput() {
+        return input;
+    }
+
+    /** Sets the target updates per second. */
     public void setTargetUPS(int ups) {
         this.targetUPS = ups;
     }
 
+    /** Sets the target frames per second. */
     public void setTargetFPS(int fps) {
         this.targetFPS = fps;
     }
 
+    /** Enables or disables vertical synchronization. */
     public void setVSync(boolean vsync) {
         this.vsync = vsync;
         if (window.isInitialized()) {
@@ -30,9 +45,12 @@ public class Engine {
         }
     }
 
+    /** Starts the engine and enters the main loop. */
     public void start() {
         window.init();
         window.setVSync(vsync);
+        input = new InputHandler(window.getHandle());
+        input.update(); // prime previous state
         gameLoop.initialize();
 
         double timePerUpdate = 1.0 / targetUPS;
@@ -45,6 +63,9 @@ public class Engine {
         int frames = 0;
 
         while (!window.shouldClose()) {
+            window.pollEvents();
+            input.poll();
+
             long now = System.nanoTime();
             double delta = (now - lastTime) / 1_000_000_000.0;
             lastTime = now;
@@ -53,6 +74,7 @@ public class Engine {
 
             while (deltaUpdate >= timePerUpdate) {
                 gameLoop.input();
+                input.update();
                 gameLoop.update();
                 updates++;
                 deltaUpdate -= timePerUpdate;
@@ -60,7 +82,7 @@ public class Engine {
 
             if (deltaFrame >= timePerFrame) {
                 gameLoop.render();
-                window.update();
+                window.swapBuffers();
                 frames++;
                 deltaFrame -= timePerFrame;
             }

@@ -1,12 +1,15 @@
 package com.absolutephoenix.game;
 
-import com.absolutephoenix.engine.Engine;
-import com.absolutephoenix.engine.GameLoop;
-import com.absolutephoenix.engine.SpriteBatch;
-import com.absolutephoenix.engine.Texture;
+import com.absolutephoenix.engine.core.Engine;
+import com.absolutephoenix.engine.core.GameLoop;
+import com.absolutephoenix.engine.rendering.SpriteBatch;
+import com.absolutephoenix.engine.rendering.Texture;
 import com.absolutephoenix.game.scenes.ExampleScene;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * Basic game implementation used to demonstrate the engine.
+ */
 public class Game implements GameLoop {
     private final int width;
     private final int height;

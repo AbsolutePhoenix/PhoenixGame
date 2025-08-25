@@ -1,4 +1,4 @@
-package com.absolutephoenix.engine;
+package com.absolutephoenix.engine.rendering;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -8,6 +8,9 @@ import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 
+/**
+ * Batches sprite draw calls for efficient rendering.
+ */
 public class SpriteBatch {
     private static final int MAX_SPRITES = 1000;
     private static final int VERTEX_SIZE = 4; // x, y, u, v
