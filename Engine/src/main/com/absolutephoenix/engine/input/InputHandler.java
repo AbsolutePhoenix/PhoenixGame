@@ -1,6 +1,7 @@
 package com.absolutephoenix.engine.input;
 
 import org.lwjgl.glfw.GLFW;
+import java.util.Optional;
 
 /**
  * Central access point for keyboard, mouse and controller input.
@@ -20,9 +21,19 @@ public class InputHandler {
         GLFW.glfwSetScrollCallback(window, (w, xoff, yoff) -> mouse.handleScroll(xoff, yoff));
     }
 
-    /** Returns the singleton instance. */
-    public static InputHandler get() {
-        return instance;
+    /**
+     * Returns the singleton instance, if it has been initialized.
+     *
+     * @return an {@link Optional} containing the current instance or empty if
+     *         no handler has been created yet
+     */
+    public static Optional<InputHandler> get() {
+        return Optional.ofNullable(instance);
+    }
+
+    /** Resets the singleton instance. */
+    public static void dispose() {
+        instance = null;
     }
 
     /** Polls devices that require manual polling. */

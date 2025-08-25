@@ -1,6 +1,7 @@
 package com.absolutephoenix.game.scenes;
 
 import com.absolutephoenix.engine.input.InputHandler;
+import java.util.Optional;
 import com.absolutephoenix.engine.rendering.SpriteBatch;
 import com.absolutephoenix.engine.rendering.Texture;
 import com.absolutephoenix.game.Scene;
@@ -28,7 +29,11 @@ public class ExampleScene implements Scene {
 
     @Override
     public void input() {
-        InputHandler input = InputHandler.get();
+        Optional<InputHandler> maybeInput = InputHandler.get();
+        if (maybeInput.isEmpty()) {
+            return;
+        }
+        InputHandler input = maybeInput.get();
         if (input.keyboard.keyPressed(GLFW.GLFW_KEY_SPACE)) {
             System.out.println("Space pressed");
         }

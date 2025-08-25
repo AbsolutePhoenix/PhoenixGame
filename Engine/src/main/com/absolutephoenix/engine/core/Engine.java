@@ -141,5 +141,6 @@ public class Engine {
 
         gameLoop.cleanup();
         window.destroy();
+        InputHandler.dispose();
     }
 }
