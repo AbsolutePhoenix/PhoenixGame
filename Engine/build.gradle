@@ -35,6 +35,7 @@ switch (OperatingSystem.current()) {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -60,4 +61,7 @@ dependencies {
     implementation "org.joml:joml-primitives:${jomlPrimitivesVersion}"
     implementation "com.code-disaster.steamworks4j:steamworks4j:${steamworks4jVersion}"
     implementation "com.code-disaster.steamworks4j:steamworks4j-server:${steamworks4jServerVersion}"
+
+    implementation 'com.github.WilliamAHartman:Jamepad:1.4.0'
+    implementation 'com.github.electronstudio:sdl2gdx:1.0.5'
 }
