@@ -141,6 +141,7 @@ public class Engine {
         }
 
         gameLoop.cleanup();
+        input.close();
         window.destroy();
         InputHandler.dispose();
         Logger.close();
