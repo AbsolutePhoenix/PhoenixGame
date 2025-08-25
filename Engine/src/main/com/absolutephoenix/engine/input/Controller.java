@@ -64,6 +64,7 @@ public class Controller {
     void update() {
         System.arraycopy(current, 0, previous, 0, current.length);
         System.arraycopy(axesCurrent, 0, axesPrevious, 0, axesCurrent.length);
+
     }
 
     public boolean buttonDown(int button) {
@@ -77,7 +78,7 @@ public class Controller {
     public boolean buttonReleased(int button) {
         return button < current.length && !current[button] && previous[button];
     }
-
+  
     public float axis(int axis) {
         return axis < axesCurrent.length ? axesCurrent[axis] : 0f;
     }
