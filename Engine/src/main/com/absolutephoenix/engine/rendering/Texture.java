@@ -15,11 +15,17 @@ import java.nio.IntBuffer;
  * Represents an OpenGL texture loaded from the classpath.
  */
 public class Texture {
+    private static boolean currentFlip = false;
+
     private final int id;
     private final int width;
     private final int height;
 
     public Texture(String resource) {
+        this(resource, true);
+    }
+
+    public Texture(String resource, boolean flipVertically) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             ByteBuffer imageBuffer;
             try (InputStream is = Texture.class.getResourceAsStream(resource)) {
@@ -37,8 +43,17 @@ public class Texture {
             IntBuffer w = stack.mallocInt(1);
             IntBuffer h = stack.mallocInt(1);
             IntBuffer comp = stack.mallocInt(1);
-            STBImage.stbi_set_flip_vertically_on_load(true);
-            ByteBuffer image = STBImage.stbi_load_from_memory(imageBuffer, w, h, comp, 4);
+
+            boolean previousFlip = currentFlip;
+            STBImage.stbi_set_flip_vertically_on_load(flipVertically);
+            currentFlip = flipVertically;
+            ByteBuffer image;
+            try {
+                image = STBImage.stbi_load_from_memory(imageBuffer, w, h, comp, 4);
+            } finally {
+                STBImage.stbi_set_flip_vertically_on_load(previousFlip);
+                currentFlip = previousFlip;
+            }
             if (image == null) {
                 throw new RuntimeException("Failed to load image: " + STBImage.stbi_failure_reason());
             }
