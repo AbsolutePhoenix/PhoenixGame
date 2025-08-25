@@ -24,7 +24,7 @@ public class Game implements GameLoop {
         batch = new SpriteBatch(width, height);
         texture = new Texture("/white.png");
         sceneManager = new SceneManager();
-        sceneManager.addScene("main", new ExampleScene(texture));
+        sceneManager.addScene("main", new ExampleScene(texture, batch));
         sceneManager.setScene("main");
     }
 
@@ -41,9 +41,7 @@ public class Game implements GameLoop {
     @Override
     public void render() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        sceneManager.render(batch);
-        batch.end();
+        sceneManager.render();
     }
 
     @Override
