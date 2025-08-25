@@ -1,4 +1,4 @@
-package com.absolutephoenix.engine;
+package com.absolutephoenix.engine.rendering;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+/**
+ * Represents an OpenGL texture loaded from the classpath.
+ */
 public class Texture {
     private final int id;
     private final int width;

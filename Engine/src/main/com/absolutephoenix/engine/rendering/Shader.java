@@ -1,7 +1,10 @@
-package com.absolutephoenix.engine;
+package com.absolutephoenix.engine.rendering;
 
 import org.lwjgl.opengl.GL20;
 
+/**
+ * Simple wrapper around an OpenGL shader program.
+ */
 public class Shader {
     private final int programId;
 
