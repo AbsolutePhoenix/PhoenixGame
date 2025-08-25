@@ -5,6 +5,9 @@ import org.lwjgl.glfw.GLFWGamepadState;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** Polls controller/gamepad state using GLFW with standardized + raw extras. */
 public class Controller {
@@ -273,26 +276,90 @@ public class Controller {
     public float leftTrigger() { return axis(AXIS_LT); }
     public float rightTrigger(){ return axis(AXIS_RT); }
 
-    // --- Extras for PS5 Edge (from your findings) ---
-    // Your GUID: 030000004c050000f20d000000000000 (Sony DualSense Edge)
-    // TrackpadClick = raw 13, MuteButton = raw 14 on your setup.
-    private boolean isDualSenseEdge() {
-        return guid != null && guid.equalsIgnoreCase("030000004c050000f20d000000000000");
-    }
-    public boolean psTrackpadDown()    { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonDown(13); }
-    public boolean psTrackpadPressed() { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonPressed(13); }
-    public boolean psTrackpadReleased(){ return (isDualSenseEdge() || isPlayStationLike()) && rawButtonReleased(13); }
+    // --- Extras (name-based + learned mapping; no hard GUIDs) ---
 
-    public boolean psMuteDown()        { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonDown(14); }
-    public boolean psMutePressed()     { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonPressed(14); }
-    public boolean psMuteReleased()    { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonReleased(14); }
+    // Trackpad / Mute convenience using registry resolution
+    public boolean psTrackpadDown()     { Integer idx = mapIndex(MappingRegistry.Logical.PS_TRACKPAD); return idx != null && rawButtonDown(idx); }
+    public boolean psTrackpadPressed()  { Integer idx = mapIndex(MappingRegistry.Logical.PS_TRACKPAD); return idx != null && rawButtonPressed(idx); }
+    public boolean psTrackpadReleased() { Integer idx = mapIndex(MappingRegistry.Logical.PS_TRACKPAD); return idx != null && rawButtonReleased(idx); }
 
-    // Utility
+    public boolean psMuteDown()         { Integer idx = mapIndex(MappingRegistry.Logical.PS_MUTE); return idx != null && rawButtonDown(idx); }
+    public boolean psMutePressed()      { Integer idx = mapIndex(MappingRegistry.Logical.PS_MUTE); return idx != null && rawButtonPressed(idx); }
+    public boolean psMuteReleased()     { Integer idx = mapIndex(MappingRegistry.Logical.PS_MUTE); return idx != null && rawButtonReleased(idx); }
+
+    // Optional: one-shot learn helpers for your input-binding UI
+    public void learnOnceTrackpad() { int i = findFirstNewlyPressedRaw(); if (i >= 0) MappingRegistry.learn(identityKey(), MappingRegistry.Logical.PS_TRACKPAD, i); }
+    public void learnOnceMute()     { int i = findFirstNewlyPressedRaw(); if (i >= 0) MappingRegistry.learn(identityKey(), MappingRegistry.Logical.PS_MUTE, i); }
+
     public int firstButtonDownIndex() {
         for (int i = 0; i < current.length; i++) if (current[i]) return i;
         return -1;
     }
 
+    private int findFirstNewlyPressedRaw() {
+        for (int i = 0; i < rawCurrent.length; i++) {
+            if (rawCurrent[i] && !rawPrevious[i]) return i;
+        }
+        return -1;
+    }
+
+    private Integer mapIndex(String logicalControl) {
+        return MappingRegistry.resolve(identityKey(), normalizedName(), logicalControl);
+    }
+
+    private String identityKey() {
+        if (guid != null && !guid.isEmpty()) return "guid:" + guid.toLowerCase();
+        String n = (gamepadName != null ? gamepadName : joystickName);
+        if (n == null) n = "unknown";
+        return "name:" + normalizeName(n);
+    }
+    private String normalizedName() {
+        String n = (gamepadName != null ? gamepadName : joystickName);
+        return (n == null) ? "" : normalizeName(n);
+    }
+    private static String normalizeName(String n) {
+        return n.toLowerCase().replaceAll("[^a-z0-9]+", " ").trim();
+    }
+
     private static void clear(boolean[] arr) { for (int i = 0; i < arr.length; i++) arr[i] = false; }
     private static void clear(float[] arr)   { for (int i = 0; i < arr.length; i++) arr[i] = 0f; }
+
+    // --- Small inlined mapping registry (defaults + learned per-session) ---
+    private static final class MappingRegistry {
+        static final class Logical {
+            static final String PS_TRACKPAD = "ps.trackpad";
+            static final String PS_MUTE     = "ps.mute";
+        }
+
+        private record NameRule(String substr, Map<String,Integer> map) {}
+
+        // Learned mappings (persist them yourself if you want across runs)
+        private static final Map<String, Map<String, Integer>> LEARNED = new ConcurrentHashMap<>();
+
+        // Defaults keyed by name substrings. Adjust if other OS/driver combos expose different indices.
+        private static final List<NameRule> DEFAULTS = List.of(
+                // More specific first
+                new NameRule("dualsense edge", Map.of(Logical.PS_TRACKPAD, 13, Logical.PS_MUTE, 14)),
+                new NameRule("dualsense", Map.of(Logical.PS_TRACKPAD, 13, Logical.PS_MUTE, 14)),
+                new NameRule("dualshock",      Map.of(Logical.PS_TRACKPAD, 13, Logical.PS_MUTE, -1))
+        );
+
+        static Integer resolve(String identityKey, String normalizedName, String logicalControl) {
+            Map<String, Integer> learned = LEARNED.get(identityKey);
+            if (learned != null && learned.containsKey(logicalControl)) return learned.get(logicalControl);
+
+            for (NameRule r : DEFAULTS) {
+                if (normalizedName.contains(r.substr)) {
+                    Integer idx = r.map.get(logicalControl);
+                    if (idx != null) return idx;
+                }
+            }
+            return null;
+        }
+
+        static void learn(String identityKey, String logicalControl, int rawIndex) {
+            LEARNED.computeIfAbsent(identityKey, k -> new ConcurrentHashMap<>())
+                    .put(logicalControl, rawIndex);
+        }
+    }
 }
