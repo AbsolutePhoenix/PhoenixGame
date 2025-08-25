@@ -5,5 +5,8 @@
 # OS files
 .DS_Store
 
+# IDE files
+.idea/
+
 # Gradle wrapper binary
 gradle/wrapper/gradle-wrapper.jar
