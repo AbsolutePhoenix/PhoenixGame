@@ -20,7 +20,9 @@ public class MappingRegistry {
             // More specific first
             new NameRule("dualsense edge", Map.of(Logical.PS_TRACKPAD, 13, Logical.PS_MUTE, 14)),
             new NameRule("dualsense", Map.of(Logical.PS_TRACKPAD, 13, Logical.PS_MUTE, 14)),
-            new NameRule("dualshock",      Map.of(Logical.PS_TRACKPAD, 13, Logical.PS_MUTE, -1))
+            new NameRule("dualshock", Map.of(Logical.PS_TRACKPAD, 13, Logical.PS_MUTE, -1))
+
+
     );
 
     static Integer resolve(String identityKey, String normalizedName, String logicalControl) {

@@ -49,7 +49,7 @@ public class Controller {
     public static final int BUTTON_DPAD_DOWN  = GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
     public static final int BUTTON_DPAD_LEFT  = GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
 
-    public static final int BUTTON_GUIDE      = 8; // PS / Xbox guide in GLFW’s standard set
+    public static final int BUTTON_GUIDE      = GLFW.GLFW_GAMEPAD_BUTTON_GUIDE; // PS / Xbox guide in GLFW’s standard set
 
     // Axis constants (GLFW standardized)
     public static final int AXIS_LEFT_X  = GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
@@ -58,12 +58,6 @@ public class Controller {
     public static final int AXIS_RIGHT_Y = GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
     public static final int AXIS_LT      = GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;   // 0..1
     public static final int AXIS_RT      = GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;  // 0..1
-
-    // --- PUBLIC: identity getters ---
-    public String getJoystickName() { return joystickName; }
-    public String getGamepadName()  { return gamepadName; }
-    public String getGUID()         { return guid; }
-    public boolean isStandardized() { return standardized; }
 
     public boolean isPlayStationLike() {
         String n = (gamepadName != null) ? gamepadName : joystickName;
@@ -268,6 +262,10 @@ public class Controller {
     public boolean dpadLeftPressed()  { return buttonPressed(BUTTON_DPAD_LEFT); }
     public boolean dpadLeftReleased() { return buttonReleased(BUTTON_DPAD_LEFT); }
 
+    public boolean guideDown()     { return buttonDown(BUTTON_GUIDE); }
+    public boolean guidePressed()  { return buttonPressed(BUTTON_GUIDE); }
+    public boolean guideReleased() { return buttonReleased(BUTTON_GUIDE); }
+
     // Axes convenience
     public float leftStickX()  { return axis(AXIS_LEFT_X); }
     public float leftStickY()  { return axis(AXIS_LEFT_Y); }
@@ -275,8 +273,6 @@ public class Controller {
     public float rightStickY() { return axis(AXIS_RIGHT_Y); }
     public float leftTrigger() { return axis(AXIS_LT); }
     public float rightTrigger(){ return axis(AXIS_RT); }
-
-    // --- Extras (name-based + learned mapping; no hard GUIDs) ---
 
     // Trackpad / Mute convenience using registry resolution
     public boolean psTrackpadDown()     { Integer idx = mapIndex(MappingRegistry.Logical.PS_TRACKPAD); return idx != null && rawButtonDown(idx); }
@@ -314,8 +310,9 @@ public class Controller {
         return "name:" + normalizeName(n);
     }
     private String normalizedName() {
-        String n = (gamepadName != null ? gamepadName : joystickName);
-        return (n == null) ? "" : normalizeName(n);
+        String n1 = (gamepadName  != null ? gamepadName  : "");
+        String n2 = (joystickName != null ? joystickName : "");
+        return normalizeName((n1 + " " + n2).trim());
     }
     private static String normalizeName(String n) {
         return n.toLowerCase().replaceAll("[^a-z0-9]+", " ").trim();

@@ -117,6 +117,11 @@ public class ExampleScene implements Scene {
         if (rightMag > DEADZONE) {
             System.out.println("Right stick: " + rx + ", " + ry);
         }
+
+        if (input.controller.psTrackpadPressed()) System.out.println("TrackPad PRESSED");
+        if (input.controller.psMutePressed())     System.out.println("Mute PRESSED");
+        if (input.controller.guidePressed())      System.out.println("Guide PRESSED");
+
     }
 
     @Override

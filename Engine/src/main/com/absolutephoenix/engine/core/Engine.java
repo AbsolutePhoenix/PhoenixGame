@@ -74,9 +74,9 @@ public class Engine {
 
             // --- UPDATE(S) ---
             while (nowNs >= nextUpdateNs) {
+                input.update();
                 input.poll();
                 gameLoop.input();
-                input.update();
                 gameLoop.update();
                 updates++;
                 nextUpdateNs += (long)(timePerUpdate * 1_000_000_000L);
