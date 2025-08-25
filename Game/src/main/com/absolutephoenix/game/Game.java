@@ -56,9 +56,9 @@ public class Game implements GameLoop {
 
     public static void main(String[] args) {
         Game game = new Game(800, 600);
-        Engine engine = new Engine(game, 800, 600, "Phoenix Game", true);
+        Engine engine = new Engine(game, 800, 600, "Phoenix Game", false);
         engine.setTargetUPS(60);
-        engine.setTargetFPS(60);
+        engine.setTargetFPS(0);
         engine.start();
     }
 }

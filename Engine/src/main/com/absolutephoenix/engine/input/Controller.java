@@ -66,7 +66,7 @@ public class Controller {
         String n = (gamepadName != null) ? gamepadName : joystickName;
         if (n == null) return false;
         n = n.toLowerCase();
-        return n.contains("dualsense") || n.contains("playstation") || n.contains("sony") || n.contains("wireless controller");
+        return n.contains("dualsense") || n.contains("playstation") || n.contains("sony") || n.contains("wireless controller") || n.contains("ps4") || n.contains("ps5");
     }
     public boolean isXboxLike() {
         String n = (gamepadName != null) ? gamepadName : joystickName;
