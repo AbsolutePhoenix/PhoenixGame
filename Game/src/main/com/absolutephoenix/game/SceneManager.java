@@ -1,7 +1,5 @@
 package com.absolutephoenix.game;
 
-import com.absolutephoenix.engine.SpriteBatch;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,9 +33,9 @@ public class SceneManager {
         }
     }
 
-    public void render(SpriteBatch batch) {
+    public void render() {
         if (currentScene != null) {
-            currentScene.render(batch);
+            currentScene.render();
         }
     }
 
