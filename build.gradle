@@ -39,18 +39,9 @@ subprojects {
         }
     }
 
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['src/main']
-            }
-        }
-        test {
-            java {
-                srcDirs = ['src/test']
-            }
-        }
-    }
+    // Configure source directories explicitly to avoid IDE DSL resolution issues
+    sourceSets.main.java.srcDirs = ['src/main']
+    sourceSets.test.java.srcDirs = ['src/test']
 }
 
 // Helper to persist version changes
