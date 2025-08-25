@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 
 public final class Logger {
     private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
     private static final String RESET = "\u001B[0m";
 
     private static LogLevel currentLevel = LogLevel.INFO;
@@ -59,13 +59,16 @@ public final class Logger {
         }
         init();
         StackTraceElement caller = Thread.currentThread().getStackTrace()[3];
-        String method = caller.getMethodName();
+        String threadName = Thread.currentThread().getName();
+        String method = caller.getClassName() + "-" + caller.getMethodName();
+        if (method.contains("com.absolutephoenix."))
+            method = method.replace("com.absolutephoenix.", "");
         String time = LocalDateTime.now().format(FORMATTER);
         String levelName = level.name();
-        String baseMessage = String.format("[%s] [%s/%s] : %s", time, levelName, method, message);
+        String baseMessage = String.format("[%s] [%s/%s/%s] : %s", time, levelName, threadName, method, message);
         // Console with color
         String coloredLevel = color(level) + levelName + RESET;
-        String consoleMessage = String.format("[%s] [%s/%s] : %s", time, coloredLevel, method, message);
+        String consoleMessage = String.format("[%s] [%s/%s/%s] : %s", time, coloredLevel, threadName, method, message);
         System.out.println(consoleMessage);
         // File without color
         try {
