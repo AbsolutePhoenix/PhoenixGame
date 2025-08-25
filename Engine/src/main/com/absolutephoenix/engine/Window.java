@@ -9,6 +9,7 @@ public class Window {
     private final int width;
     private final int height;
     private final String title;
+    private boolean initialized;
 
     public Window(int width, int height, String title) {
         this.width = width;
@@ -29,6 +30,7 @@ public class Window {
         GL.createCapabilities();
         GL11.glClearColor(0f, 0f, 0f, 1f);
         GLFW.glfwShowWindow(handle);
+        initialized = true;
     }
 
     public boolean shouldClose() {
@@ -43,6 +45,18 @@ public class Window {
     public void destroy() {
         GLFW.glfwDestroyWindow(handle);
         GLFW.glfwTerminate();
+    }
+
+    public void setTitle(String title) {
+        GLFW.glfwSetWindowTitle(handle, title);
+    }
+
+    public void setVSync(boolean vsync) {
+        GLFW.glfwSwapInterval(vsync ? 1 : 0);
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 
     public int getWidth() {
