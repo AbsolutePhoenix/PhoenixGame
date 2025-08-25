@@ -59,25 +59,59 @@ public class ExampleScene implements Scene {
         if (input.controller.dpadUpPressed()) {
             System.out.println("DPad Up pressed");
         }
+        if (input.controller.dpadDownPressed()) {
+            System.out.println("DPad Down pressed");
+        }
+        if (input.controller.dpadLeftPressed()) {
+            System.out.println("DPad Left pressed");
+        }
+        if (input.controller.dpadRightPressed()) {
+            System.out.println("DPad Right pressed");
+        }
         if (input.controller.leftBumperPressed()) {
             System.out.println("Left bumper pressed");
         }
         if (input.controller.rightBumperPressed()) {
             System.out.println("Right bumper pressed");
         }
-        if (input.controller.leftTriggerPressed()) {
-            System.out.println("Left trigger value: " + input.controller.leftTrigger());
+        if (input.controller.leftStickPressed()) {
+            System.out.println("Left stick pressed");
         }
-        if (input.controller.rightTriggerPressed()) {
-            System.out.println("Right trigger value: " + input.controller.leftTrigger());
+        if (input.controller.rightStickPressed()) {
+            System.out.println("Right stick pressed");
         }
 
-        if (Math.abs(input.controller.leftStickX()) > 0.1f || Math.abs(input.controller.leftStickY()) > 0.1f) {
-            System.out.println("Left stick: " + input.controller.leftStickX() + ", " + input.controller.leftStickY());
+        float TRIGGER_DEADZONE = 0.05f; // tweak as needed
+
+        float lt = input.controller.leftTrigger();
+        float rt = input.controller.rightTrigger();
+
+        if (lt > TRIGGER_DEADZONE) {
+            System.out.println("Left trigger: " + lt);
         }
-//        if (Math.abs(input.controller.rightStickX()) > 0.1f || Math.abs(input.controller.rightStickY()) > 0.1f) {
-//            System.out.println("Right stick: " + input.controller.rightStickX() + ", " + input.controller.rightStickY());
-//        }
+
+        if (rt > TRIGGER_DEADZONE) {
+            System.out.println("Right trigger: " + rt);
+        }
+
+        float lx = input.controller.leftStickX();
+        float ly = input.controller.leftStickY();
+        float rx = input.controller.rightStickX();
+        float ry = input.controller.rightStickY();
+
+        float DEADZONE = 0.05f;
+
+        // Left stick
+        float leftMag = (float)Math.sqrt(lx * lx + ly * ly);
+        if (leftMag > DEADZONE) {
+            System.out.println("Left stick: " + lx + ", " + ly);
+        }
+
+        // Right stick
+        float rightMag = (float)Math.sqrt(rx * rx + ry * ry);
+        if (rightMag > DEADZONE) {
+            System.out.println("Right stick: " + rx + ", " + ry);
+        }
     }
 
     @Override
