@@ -41,6 +41,27 @@ public class ExampleScene implements Scene {
         if (input.controller.squarePressed()) {
             System.out.println("Square button pressed");
         }
+        if (input.controller.crossPressed()) {
+            System.out.println("Cross button pressed");
+        }
+        if (input.controller.startPressed()) {
+            System.out.println("Start button pressed");
+        }
+        if (input.controller.selectPressed()) {
+            System.out.println("Select button pressed");
+        }
+        if (input.controller.dpadUpPressed()) {
+            System.out.println("DPad Up pressed");
+        }
+        if (input.controller.leftBumperPressed()) {
+            System.out.println("Left bumper pressed");
+        }
+        if (input.controller.leftTriggerPressed()) {
+            System.out.println("Left trigger value: " + input.controller.leftTrigger());
+        }
+        if (Math.abs(input.controller.leftStickX()) > 0.1f || Math.abs(input.controller.leftStickY()) > 0.1f) {
+            System.out.println("Left stick: " + input.controller.leftStickX() + ", " + input.controller.leftStickY());
+        }
     }
 
     @Override
