@@ -1,0 +1,9 @@
+# Gradle files
+.gradle/
+**/build/
+
+# OS files
+.DS_Store
+
+# Gradle wrapper binary
+gradle/wrapper/gradle-wrapper.jar
