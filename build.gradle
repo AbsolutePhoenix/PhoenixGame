@@ -1,6 +1,28 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+}
+
+import java.util.Properties
+
+// Load or create version properties
+File versionFile = file('version.properties')
+Properties versionProps = new Properties()
+versionFile.withInputStream { versionProps.load(it) }
+
+// Automatically bump build number when any build task is requested
+if (gradle.startParameter.taskNames.any { it.split(':').last() == 'build' }) {
+    int buildNum = versionProps.getProperty('versionBuild').toInteger()
+    versionProps.setProperty('versionBuild', (buildNum + 1).toString())
+    versionProps.store(versionFile.newWriter(), null)
+}
+
+def computeVersion = {
+    "${versionProps['versionMajor']}.${versionProps['versionMinor']}.${versionProps['versionPatch']} (${versionProps['versionBuild']})"
+}
+
 allprojects {
     group = 'com.absolutephoenix'
-    version = '0.1.0'
+    version = computeVersion()
 
     repositories {
         mavenCentral()
@@ -9,6 +31,13 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(23)
+        }
+    }
 
     sourceSets {
         main {
@@ -21,5 +50,58 @@ subprojects {
                 srcDirs = ['src/test']
             }
         }
+    }
+}
+
+// Helper to persist version changes
+def saveVersion = {
+    versionProps.store(versionFile.newWriter(), null)
+    project.version = computeVersion()
+}
+
+tasks.register('bumpMajor') {
+    group = 'versioning'
+    description = 'Increment major version and reset minor, patch, and build numbers.'
+    doLast {
+        versionProps['versionMajor'] = (versionProps['versionMajor'].toInteger() + 1).toString()
+        versionProps['versionMinor'] = '0'
+        versionProps['versionPatch'] = '0'
+        versionProps['versionBuild'] = '0'
+        saveVersion()
+        println "New version: ${project.version}"
+    }
+}
+
+tasks.register('bumpMinor') {
+    group = 'versioning'
+    description = 'Increment minor version and reset patch and build numbers.'
+    doLast {
+        versionProps['versionMinor'] = (versionProps['versionMinor'].toInteger() + 1).toString()
+        versionProps['versionPatch'] = '0'
+        versionProps['versionBuild'] = '0'
+        saveVersion()
+        println "New version: ${project.version}"
+    }
+}
+
+tasks.register('bumpPatch') {
+    group = 'versioning'
+    description = 'Increment patch version and reset build number.'
+    doLast {
+        versionProps['versionPatch'] = (versionProps['versionPatch'].toInteger() + 1).toString()
+        versionProps['versionBuild'] = '0'
+        saveVersion()
+        println "New version: ${project.version}"
+    }
+}
+
+// Manual build number increment task (optional)
+tasks.register('bumpBuild') {
+    group = 'versioning'
+    description = 'Increment build number.'
+    doLast {
+        versionProps['versionBuild'] = (versionProps['versionBuild'].toInteger() + 1).toString()
+        saveVersion()
+        println "New version: ${project.version}"
     }
 }
