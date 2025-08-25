@@ -1,9 +1,12 @@
-package com.absolutephoenix.engine;
+package com.absolutephoenix.engine.window;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * Simple GLFW window wrapper.
+ */
 public class Window {
     private long handle;
     private final int width;
@@ -17,6 +20,7 @@ public class Window {
         this.title = title;
     }
 
+    /** Creates the window and OpenGL context. */
     public void init() {
         if (!GLFW.glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
@@ -33,15 +37,27 @@ public class Window {
         initialized = true;
     }
 
+    /** Returns the native GLFW window handle. */
+    public long getHandle() {
+        return handle;
+    }
+
+    /** Returns true if the window should close. */
     public boolean shouldClose() {
         return GLFW.glfwWindowShouldClose(handle);
     }
 
-    public void update() {
-        GLFW.glfwSwapBuffers(handle);
+    /** Polls pending window events. */
+    public void pollEvents() {
         GLFW.glfwPollEvents();
     }
 
+    /** Swaps the front and back buffers. */
+    public void swapBuffers() {
+        GLFW.glfwSwapBuffers(handle);
+    }
+
+    /** Destroys the window and terminates GLFW. */
     public void destroy() {
         GLFW.glfwDestroyWindow(handle);
         GLFW.glfwTerminate();
