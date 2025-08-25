@@ -5,6 +5,8 @@ import org.lwjgl.glfw.GLFWGamepadState;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Polls controller/gamepad state using GLFW with standardized + raw extras. */
 public class Controller {
@@ -23,6 +25,25 @@ public class Controller {
     // Raw state (for extra buttons like PS5 trackpad/mute)
     private final boolean[] rawCurrent = new boolean[MAX_BUTTONS];
     private final boolean[] rawPrevious = new boolean[MAX_BUTTONS];
+
+    private static class ExtraButtons {
+        final Integer trackpad;
+        final Integer mute;
+        ExtraButtons(Integer trackpad, Integer mute) {
+            this.trackpad = trackpad;
+            this.mute = mute;
+        }
+    }
+
+    private static final Map<String, ExtraButtons> EXTRA_BUTTON_MAP = new HashMap<>();
+    static {
+        EXTRA_BUTTON_MAP.put("030000004c050000c405000000010000", new ExtraButtons(13, null)); // DualShock 4
+        EXTRA_BUTTON_MAP.put("030000004c050000e60d000000000000", new ExtraButtons(13, 14));  // DualSense
+        EXTRA_BUTTON_MAP.put("030000004c050000f20d000000000000", new ExtraButtons(13, 14));  // DualSense Edge
+    }
+
+    private ExtraButtons extras = null;
+    private boolean warnedMissingExtras = false;
 
     // Identity
     private String joystickName = null;
@@ -92,6 +113,8 @@ public class Controller {
             clear(axesCurrent);
             joystickName = gamepadName = guid = null;
             standardized = false;
+            extras = null;
+            warnedMissingExtras = false;
             return;
         }
 
@@ -100,6 +123,14 @@ public class Controller {
         guid         = GLFW.glfwGetJoystickGUID(JID);
         standardized = GLFW.glfwJoystickIsGamepad(JID);
         gamepadName  = standardized ? GLFW.glfwGetGamepadName(JID) : null;
+
+        extras = (guid != null) ? EXTRA_BUTTON_MAP.get(guid.toLowerCase()) : null;
+        if (extras != null) {
+            warnedMissingExtras = false;
+        } else if (isPlayStationLike() && !warnedMissingExtras) {
+            System.err.println("Warning: PlayStation controller " + guid + " missing extra button mappings");
+            warnedMissingExtras = true;
+        }
 
         // Always read RAW so we can catch extras (PS5 trackpad/mute) or unknown pads
         ByteBuffer rawButtons = GLFW.glfwGetJoystickButtons(JID);
@@ -273,19 +304,14 @@ public class Controller {
     public float leftTrigger() { return axis(AXIS_LT); }
     public float rightTrigger(){ return axis(AXIS_RT); }
 
-    // --- Extras for PS5 Edge (from your findings) ---
-    // Your GUID: 030000004c050000f20d000000000000 (Sony DualSense Edge)
-    // TrackpadClick = raw 13, MuteButton = raw 14 on your setup.
-    private boolean isDualSenseEdge() {
-        return guid != null && guid.equalsIgnoreCase("030000004c050000f20d000000000000");
-    }
-    public boolean psTrackpadDown()    { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonDown(13); }
-    public boolean psTrackpadPressed() { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonPressed(13); }
-    public boolean psTrackpadReleased(){ return (isDualSenseEdge() || isPlayStationLike()) && rawButtonReleased(13); }
+    // --- PlayStation-specific extras ---
+    public boolean psTrackpadDown()    { return extras != null && extras.trackpad != null && rawButtonDown(extras.trackpad); }
+    public boolean psTrackpadPressed() { return extras != null && extras.trackpad != null && rawButtonPressed(extras.trackpad); }
+    public boolean psTrackpadReleased(){ return extras != null && extras.trackpad != null && rawButtonReleased(extras.trackpad); }
 
-    public boolean psMuteDown()        { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonDown(14); }
-    public boolean psMutePressed()     { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonPressed(14); }
-    public boolean psMuteReleased()    { return (isDualSenseEdge() || isPlayStationLike()) && rawButtonReleased(14); }
+    public boolean psMuteDown()        { return extras != null && extras.mute != null && rawButtonDown(extras.mute); }
+    public boolean psMutePressed()     { return extras != null && extras.mute != null && rawButtonPressed(extras.mute); }
+    public boolean psMuteReleased()    { return extras != null && extras.mute != null && rawButtonReleased(extras.mute); }
 
     // Utility
     public int firstButtonDownIndex() {
