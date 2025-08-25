@@ -63,9 +63,6 @@ public class Engine {
         int frames = 0;
 
         while (!window.shouldClose()) {
-            window.pollEvents();
-            input.poll();
-
             long now = System.nanoTime();
             double delta = (now - lastTime) / 1_000_000_000.0;
             lastTime = now;
@@ -73,6 +70,7 @@ public class Engine {
             deltaFrame += delta;
 
             while (deltaUpdate >= timePerUpdate) {
+                input.poll();
                 gameLoop.input();
                 input.update();
                 gameLoop.update();
@@ -81,6 +79,7 @@ public class Engine {
             }
 
             if (deltaFrame >= timePerFrame) {
+                window.pollEvents();
                 gameLoop.render();
                 window.swapBuffers();
                 frames++;
