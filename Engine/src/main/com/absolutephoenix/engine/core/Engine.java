@@ -1,6 +1,7 @@
 package com.absolutephoenix.engine.core;
 
 import com.absolutephoenix.engine.input.InputHandler;
+import com.absolutephoenix.engine.logging.Logger;
 import com.absolutephoenix.engine.window.Window;
 
 import static org.lwjgl.glfw.GLFW.glfwWaitEventsTimeout;
@@ -142,5 +143,6 @@ public class Engine {
         gameLoop.cleanup();
         window.destroy();
         InputHandler.dispose();
+        Logger.close();
     }
 }

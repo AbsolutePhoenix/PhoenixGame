@@ -80,6 +80,19 @@ public final class Logger {
         }
     }
 
+    public static void close() {
+        if (writer != null) {
+            try {
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            writer = null;
+        }
+        initialized = false;
+    }
+
     private static boolean shouldLog(LogLevel level) {
         return level.getPriority() >= currentLevel.getPriority() && level != LogLevel.OFF && currentLevel != LogLevel.OFF;
     }
