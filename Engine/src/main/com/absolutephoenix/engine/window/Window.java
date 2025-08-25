@@ -1,6 +1,7 @@
 package com.absolutephoenix.engine.window;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
@@ -59,8 +60,13 @@ public class Window {
 
     /** Destroys the window and terminates GLFW. */
     public void destroy() {
-        GLFW.glfwDestroyWindow(handle);
+        if (handle != 0L) {
+            Callbacks.glfwFreeCallbacks(handle);
+            GLFW.glfwDestroyWindow(handle);
+            handle = 0L;
+        }
         GLFW.glfwTerminate();
+        initialized = false;
     }
 
     public void setTitle(String title) {
