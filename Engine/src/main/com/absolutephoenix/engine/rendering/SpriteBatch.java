@@ -123,6 +123,7 @@ public class SpriteBatch {
         GL11.glDrawElements(GL11.GL_TRIANGLES, sprites * 6, GL11.GL_UNSIGNED_INT, 0);
         GL30.glBindVertexArray(0);
         shader.unbind();
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
         buffer.clear();
         sprites = 0;
     }
